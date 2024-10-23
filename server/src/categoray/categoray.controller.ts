@@ -17,10 +17,16 @@ export class CategorayController {
     return this.categorayService.findAll();
   }
 
+  @Get('history')
+  History() {
+    return this.categorayService.History();
+  }
+
   @Get('getone/:id')
   findOne(@Param('id') id: string) {
     return this.categorayService.findOne(+id);
   }
+
 
   @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateCategorayDto: UpdateCategorayDto) {

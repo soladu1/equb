@@ -1,6 +1,141 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { 
+  Spinner, 
+  useToast, 
+  Button, 
+  AlertDialog, 
+  AlertDialogBody, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogContent, 
+  AlertDialogOverlay, 
+  Input 
+} from "@chakra-ui/react";
+
+const API = import.meta.env.VITE_API_URL;
 
 export const AllUsers = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editUserId, setEditUserId] = useState(null);
+  const [updatedUser, setUpdatedUser] = useState({});
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const cancelRef = useRef();
+  const toast = useToast();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(`${API}/customers/get`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch users data.");
+        }
+        const data = await response.json();
+        setUsers(data);
+      } catch (err) {
+        setError(err.message);
+        toast({
+          title: "Error fetching users",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [toast]);
+
+  const handleDelete = async () => {
+    try {
+      await fetch(`${API}/customers/delete/${deletingUser.id}`, { method: 'DELETE' });
+      setUsers(users.filter(user => user.id !== deletingUser.id));
+      toast({
+        title: "User deleted",
+        description: "በተሳካ ሁኔታ አባሉን አጥፍተዋል.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error deleting user",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setDeletingUser(null);
+      setIsDeleteOpen(false);
+    }
+  };
+
+  const handleEdit = (user) => {
+    setEditUserId(user.id);
+    setUpdatedUser({ ...user });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await fetch(`${API}/customers/update/${editUserId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+      setUsers(users.map(user => user.id === editUserId ? updatedUser : user));
+      toast({
+        title: "User updated",
+        description: "በተሳካ ሁኔታ መረጃውን ቀይረዋል.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      setEditUserId(null);
+    } catch (error) {
+      toast({
+        title: "Error updating user",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const openDeleteDialog = (user) => {
+    setDeletingUser(user);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setIsDeleteOpen(false);
+    setDeletingUser(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size="xl" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="py-4 px-3 px-md-4">
       <div className="card mb-3 mb-md-4">
@@ -12,7 +147,7 @@ export const AllUsers = () => {
                 <a href="#">Users</a>
               </li>
               <li className="breadcrumb-item active" aria-current="page">
-              ሙሉ አባላት
+                ሙሉ አባላት
               </li>
             </ol>
           </nav>
@@ -22,7 +157,7 @@ export const AllUsers = () => {
             <div className="h3 mb-0">የአባላት ስም ዝርዝር</div>
           </div>
 
-          {/* <!-- Users --> */}
+          {/* <!-- Users Table --> */}
           <div className="table-responsive-xl">
             <table className="table text-nowrap mb-0">
               <thead>
@@ -35,176 +170,114 @@ export const AllUsers = () => {
                     ስልክ
                   </th>
                   <th className="font-weight-semi-bold border-top-0 py-2">
-                    የገባበት ቀን
+                    የስራ ቦታ
                   </th>
-                  {/* <th className="font-weight-semi-bold border-top-0 py-2">
-                    Status
-                  </th> */}
+                  <th className="font-weight-semi-bold border-top-0 py-2">
+                    ጾታ
+                  </th>
                   <th className="font-weight-semi-bold border-top-0 py-2">
                     መረጃ ለመቀየር
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="py-3">1</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        <span className="indicator indicator-lg indicator-bordered-reverse indicator-top-left indicator-success rounded-circle"></span>
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">J</span>
-                      </div>
-                      John Doe
-                    </div>
-                  </td>
-                  <td className="py-3">john.doe@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  {/* <td className="py-3">
-                    <span className="badge badge-pill badge-success">
-                      Verified
-                    </span>
-                  </td> */}
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block mr-5" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3">2</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">S</span>
-                      </div>
-                      Sam Dew
-                    </div>
-                  </td>
-                  <td className="py-3">sam.dew@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  {/* <td className="py-3">
-                    <span className="badge badge-pill badge-warning">
-                      Pending
-                    </span>
-                  </td> */}
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3">3</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        <span className="indicator indicator-lg indicator-bordered-reverse indicator-top-left indicator-success rounded-circle"></span>
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">A</span>
-                      </div>
-                      Anna Doe
-                    </div>
-                  </td>
-                  <td className="py-3">anna.doe@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  {/* <td className="py-3">
-                    <span className="badge badge-pill badge-success">
-                      Verified
-                    </span>
-                  </td> */}
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
+                {users.map((user, index) => (
+                  <tr key={user.id}>
+                    <td className="py-3">{index + 1}</td>
+                    <td className="align-middle py-3">
+                      {editUserId === user.id ? (
+                        <Input 
+                          value={updatedUser.Name} 
+                          onChange={(e) => setUpdatedUser({ ...updatedUser, Name: e.target.value })}
+                        />
+                      ) : (
+                        <div className="d-flex align-items-center">
+                          <div className="position-relative mr-2">
+                            <span className="avatar-placeholder mr-md-2">
+                              {user.Name.charAt(0)}
+                            </span>
+                          </div>
+                          {user.Name}
+                        </div>
+                      )}
+                    </td>
+                    <td className="py-3">
+                      {editUserId === user.id ? (
+                        <Input 
+                          value={updatedUser.Phone} 
+                          onChange={(e) => setUpdatedUser({ ...updatedUser, Phone: e.target.value })}
+                        />
+                      ) : (
+                        user.Phone
+                      )}
+                    </td>
+                    <td className="py-3">
+                      {editUserId === user.id ? (
+                        <Input 
+                          value={updatedUser.WorkingPlace} 
+                          onChange={(e) => setUpdatedUser({ ...updatedUser, WorkingPlace: e.target.value })}
+                        />
+                      ) : (
+                        user.WorkingPlace
+                      )}
+                    </td>
+                    <td className="py-3">
+                      {editUserId === user.id ? (
+                        <Input 
+                          value={updatedUser.Gender} 
+                          onChange={(e) => setUpdatedUser({ ...updatedUser, Gender: e.target.value })}
+                        />
+                      ) : (
+                        user.Gender
+                      )}
+                    </td>
+                    <td className="py-3">
+                      {editUserId === user.id ? (
+                        <Button colorScheme="blue" onClick={handleUpdate}>Save</Button>
+                      ) : (
+                        <div className="position-relative">
+                          <a className="link-dark d-inline-block mr-5" onClick={() => handleEdit(user)}>
+                            <i className="gd-pencil icon-text"></i>
+                          </a>
+                          <a className="link-dark d-inline-block" onClick={() => openDeleteDialog(user)}>
+                            <i className="gd-trash icon-text"></i>
+                          </a>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-            <div className="card-footer d-block d-md-flex align-items-center d-print-none">
-              <div className="d-flex mb-2 mb-md-0">
-                Showing 1 to 8 of 24 Entries
-              </div>
-
-              <nav
-                className="d-flex ml-md-auto d-print-none"
-                aria-label="Pagination"
-              >
-                <ul className="pagination justify-content-end font-weight-semi-bold mb-0">
-                  {" "}
-                  <li className="page-item">
-                    {" "}
-                    <a
-                      id="datatablePaginationPrev"
-                      className="page-link"
-                      href="#!"
-                      aria-label="Previous"
-                    >
-                      <i className="gd-angle-left icon-text icon-text-xs d-inline-block"></i>
-                    </a>{" "}
-                  </li>
-                  <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePaginationPage0"
-                      className="page-link active"
-                      href="#!"
-                      data-dt-page-to="0"
-                    >
-                      1
-                    </a>
-                  </li>
-                  <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePagination1"
-                      className="page-link"
-                      href="#!"
-                      data-dt-page-to="1"
-                    >
-                      2
-                    </a>
-                  </li>
-                  <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePagination2"
-                      className="page-link"
-                      href="#!"
-                      data-dt-page-to="2"
-                    >
-                      3
-                    </a>
-                  </li>
-                  <li className="page-item">
-                    {" "}
-                    <a
-                      id="datatablePaginationNext"
-                      className="page-link"
-                      href="#!"
-                      aria-label="Next"
-                    >
-                      <i className="gd-angle-right icon-text icon-text-xs d-inline-block"></i>
-                    </a>{" "}
-                  </li>{" "}
-                </ul>
-              </nav>
-            </div>
           </div>
-          {/* <!-- End Users --> */}
+
+          {/* Delete Confirmation Modal */}
+          <AlertDialog
+            isOpen={isDeleteOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={closeDeleteDialog}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  ያረጋግጡ !!!
+                </AlertDialogHeader>
+
+                <AlertDialogBody>
+                 እርግጠኛ ኖት ይህንን አባል ማጥፋት ይፈልጋሉ ?
+                </AlertDialogBody>
+
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={closeDeleteDialog}>
+                    ተመለስ
+                  </Button>
+                  <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                    አጥፋ
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
         </div>
       </div>
     </div>

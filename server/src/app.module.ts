@@ -14,6 +14,8 @@ import { DatesModule } from './dates/dates.module';
 import { Categoray } from './categoray/entities/categoray.entity';
 import { Customer } from './customers/entities/customer.entity';
 import { PaymentDate } from './dates/entities/date.entity';
+import { MembersModule } from './members/members.module';
+import { Member } from './members/entities/member.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { PaymentDate } from './dates/entities/date.entity';
       username: process.env.USER_NAME,
       password: process.env.PASSWORD,
       database: process.env.DB,
-      entities: [User,Categoray,Customer,PaymentDate],
+      entities: [User,Categoray,Customer,PaymentDate,Member],
       synchronize: true,
     }),
     UsersModule,
@@ -39,6 +41,7 @@ import { PaymentDate } from './dates/entities/date.entity';
     CustomersModule,
     CategorayModule,
     DatesModule,
+    MembersModule,
   ],
   providers: [
     CustomLogger,

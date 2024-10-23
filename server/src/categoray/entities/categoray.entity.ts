@@ -1,5 +1,6 @@
-import { Customer } from 'src/customers/entities/customer.entity';
+import { PaymentDate } from 'src/dates/entities/date.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Member } from 'src/members/entities/member.entity'; // Import Member entity
 
 @Entity()
 export class Categoray {
@@ -18,6 +19,11 @@ export class Categoray {
   @Column({ default: false })
   IsCompleted: boolean;
 
-  @OneToMany(() => Customer, customer => customer.category)
-  customers: Customer[];
+   // One-to-many relationship with Member
+   @OneToMany(() => Member, (member) => member.categoray)
+   members: Member[];  // This property will store the related members for a category
+   
+  // One category can have many payment dates
+  @OneToMany(() => PaymentDate, (paymentDate) => paymentDate.category)
+  paymentDates: PaymentDate[];  // List of related payment dates
 }

@@ -10,9 +10,10 @@ export class CreateAuthDto {
   //     message:
   //       'Password must be at least 8 characters long and contain at least one letter and one number',
   //   })
-  @IsNotEmpty()
-  @IsString()
-  Password: string;
+  // @IsNotEmpty()
+  // @IsString()
+  Password: any;
+  old_password:any;
 
   phone: string;
 }

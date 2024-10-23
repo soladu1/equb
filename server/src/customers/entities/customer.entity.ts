@@ -1,6 +1,7 @@
 import { Categoray } from 'src/categoray/entities/categoray.entity';
 import { PaymentDate } from 'src/dates/entities/date.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Member } from 'src/members/entities/member.entity'; // Import Member entity
 
 @Entity()
 export class Customer {
@@ -8,7 +9,7 @@ export class Customer {
   id: number;
 
   @Column()
-  Phone: number;
+  Phone: string;
 
   @Column()
   WorkingPlace: string;
@@ -19,10 +20,13 @@ export class Customer {
   @Column()
   Gender: string;
 
+
+  // One-to-many relationship with Member
+  @OneToMany(() => Member, (member) => member.customer)
+  members: Member[];  // This property will store the related members for a customer
+
   // Many customers can be associated with one category
-  @ManyToOne(() => Categoray)
-  @JoinColumn({ name: 'categoryId' })  // This creates the foreign key column 'categoryId'
-  category: Categoray;  // This will store the Categoray entity that is related to this customer
+  
 
   // Define the OneToMany relationship to PaymentDate
   @OneToMany(() => PaymentDate, (paymentDate) => paymentDate.customer)

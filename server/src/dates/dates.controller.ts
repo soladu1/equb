@@ -8,7 +8,7 @@ export class DatesController {
   constructor(private readonly datesService: DatesService) {}
 
   @Post('add')
-  create(@Body() createDateDto: CreateDateDto) {
+  create(@Body() createDateDto: CreateDateDto[]) {
     return this.datesService.create(createDateDto);
   }
 
@@ -22,11 +22,15 @@ export class DatesController {
     return this.datesService.findOne(+id);
   }
 
-  @Patch('update/:id')
-  update(@Param('id') id: string, @Body() updateDateDto: UpdateDateDto) {
-    return this.datesService.update(+id, updateDateDto);
+  @Patch('update')
+  update( @Body() updateDateDto: UpdateDateDto[]) {
+    return this.datesService.updateMultiple(updateDateDto);
   }
-
+  @Patch('addUsers')
+  addUsersToCategory( @Body() updateDateDto: UpdateDateDto) {
+    return this.datesService.addUsersToCategory(updateDateDto);
+  }
+  
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.datesService.remove(+id);

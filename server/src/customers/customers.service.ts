@@ -11,39 +11,37 @@ export class CustomersService {
   constructor(
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
-
-    @InjectRepository(Categoray)
-    private readonly categorayRepository: Repository<Categoray>, // You need this to handle the foreign key relationship
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto) {
-    console.log(createCustomerDto)
-
+    // Log the received DTO
+    console.log(createCustomerDto);
+  
+    // Validate each field individually
+    const { Name, WorkingPlace, Gender, Phone } = createCustomerDto;
+    
+    if (!Name || !WorkingPlace || !Gender || !Phone) {
+      return { error: 'ሙሉ መረጃ አልተካተተም ደግመው ያረጋግጡ' };
+    }
+  
     try {
-      // Fetch the related category using the categoryId provided in the DTO
-      const category = await this.categorayRepository.findOne(
-        {where:{id:createCustomerDto.categoryId,}}
-      );
-      if (!category) {
-        return { error: 'እንደዚ አይነት እቁብ አልተገኘም' };
-      }
-
+      // Log the DTO before saving
+      console.log('Received data:', createCustomerDto);
+  
       // Create a new Customer entity
-      const newCustomer = this.customerRepository.create({
-        Name: createCustomerDto.Name,
-        Phone: createCustomerDto.Phone,
-        WorkingPlace: createCustomerDto.WorkingPlace,
-        Gender: createCustomerDto.Gender,
-        category, // Set the relation to the category
-      });
-      console.log(newCustomer)
-
+      const newCustomer = this.customerRepository.create(createCustomerDto);
+  
+      // Log the newly created customer before saving
+      console.log('New customer object:', newCustomer);
+  
       // Save the new customer to the database
       return await this.customerRepository.save(newCustomer);
     } catch (error) {
+      console.error('Error occurred while saving customer:', error.message);
       return { error: 'የውስጥ ችግር ስለተፈጠረ መልሰው ይሞክሩ' };
     }
   }
+  
 
   async findAll() {
     try {
@@ -67,9 +65,8 @@ export class CustomersService {
   }
 
   async update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    if(!id){
+    if (!id) {
       return { error: 'የተፈለገው ሰው አልተገኘም በድጋሚ ይሞልሩ' };
-
     }
     try {
       const customer = await this.customerRepository.findOneBy({ id });

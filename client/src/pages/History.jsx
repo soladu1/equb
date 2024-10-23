@@ -1,210 +1,118 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+const API = import.meta.env.VITE_API_URL;
 
 export const History = () => {
+  // State to store fetched data
+  const [historyData, setHistoryData] = useState([]);
+  
+  // Fetch data from API when component mounts
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await axios.get(`${API}/categoray/history`);
+        setHistoryData(response.data);  // Set data to state
+      } catch (error) {
+        console.error("Error fetching history data:", error);
+      }
+    };
+
+    fetchHistory(); // Call the function
+  }, []); // Empty array means it runs only once on mount
+
   return (
     <div className="py-4 px-3 px-md-4">
       <div className="card mb-3 mb-md-4">
         <div className="card-body">
-          {/* <!-- Breadcrumb --> */}
+          {/* Breadcrumb */}
           <nav className="d-none d-md-block" aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
                 <a href="#">Users</a>
               </li>
               <li className="breadcrumb-item active" aria-current="page">
-              ሙሉ አባላት
+                ሙሉ አባላት
               </li>
             </ol>
           </nav>
-          {/* <!-- End Breadcrumb --> */}
+          {/* End Breadcrumb */}
 
           <div className="mb-3 mb-md-4 d-flex justify-content-between">
             <div className="h3 mb-0">የአባላት ስም ዝርዝር</div>
           </div>
 
-          {/* <!-- Users --> */}
+          {/* Users Table */}
           <div className="table-responsive-xl">
             <table className="table text-nowrap mb-0">
               <thead>
                 <tr>
                   <th className="font-weight-semi-bold border-top-0 py-2">#</th>
-                  <th className="font-weight-semi-bold border-top-0 py-2">
-                    የእቁብ መጠን
-                  </th>
-                  <th className="font-weight-semi-bold border-top-0 py-2">
-                    የአባላት ብዛት
-                  </th>
-                  <th className="font-weight-semi-bold border-top-0 py-2">
-                   የጀመረበት ቀን
-                  </th>
-                  <th className="font-weight-semi-bold border-top-0 py-2">
-                    ያበቃበት ቀን
-                  </th>
-                  <th className="font-weight-semi-bold border-top-0 py-2">
-                    መረጃ ለመቀየር
-                  </th>
+                  <th className="font-weight-semi-bold border-top-0 py-2">የእቁብ መጠን</th>
+                  <th className="font-weight-semi-bold border-top-0 py-2">የጀመረበት ቀን</th>
+                  <th className="font-weight-semi-bold border-top-0 py-2">ያበቃበት ቀን</th>
+                  <th className="font-weight-semi-bold border-top-0 py-2">መረጃ ለመቀየር</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="py-3">1</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        <span className="indicator indicator-lg indicator-bordered-reverse indicator-top-left indicator-success rounded-circle"></span>
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">J</span>
-                      </div>
-                      John Doe
-                    </div>
-                  </td>
-                  <td className="py-3">john.doe@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  <td className="py-3">
-                    <span className="badge badge-pill badge-success">
-                      12/33/44
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block mr-5" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3">2</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">S</span>
-                      </div>
-                      Sam Dew
-                    </div>
-                  </td>
-                  <td className="py-3">sam.dew@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  <td className="py-3">
-                    <span className="badge badge-pill badge-warning">
-                      12/11/42
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3">3</td>
-                  <td className="align-middle py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative mr-2">
-                        <span className="indicator indicator-lg indicator-bordered-reverse indicator-top-left indicator-success rounded-circle"></span>
-                        {/* <!--img className="avatar rounded-circle" src="#" alt="John Doe"--> */}
-                        <span className="avatar-placeholder mr-md-2">A</span>
-                      </div>
-                      Anna Doe
-                    </div>
-                  </td>
-                  <td className="py-3">anna.doe@example.com</td>
-                  <td className="py-3">January 15, 2019</td>
-                  <td className="py-3">
-                    <span className="badge badge-pill badge-success">
-                      33/12/21
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    <div className="position-relative">
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-pencil icon-text"></i>
-                      </a>
-                      <a className="link-dark d-inline-block" href="#">
-                        <i className="gd-trash icon-text"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
+                {historyData.length > 0 ? (
+                  historyData.map((item, index) => (
+                    <tr key={item.id} className="hover:blue-400">
+                      <td className="py-3">{index + 1}</td>
+                      <td className="py-3">{item.Amount}</td>
+                      <td className="py-3">{new Date(item.Start).toLocaleDateString()}</td>
+                      <td className="py-3">{new Date(item.End).toLocaleDateString()}</td>
+                      <td className="py-3">
+                        <div className="position-relative">
+                          <Link to={`/historyDetails/${item.id}?start=${item.Start}&end=${item.End}`} className="link-dark d-inline-block mr-5" >
+                            <i className="gd-eye icon-text"></i>
+                          </Link>
+                          <a className="link-dark d-inline-block" href="#">
+                            <i className="gd-trash icon-text"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-3">
+                      No data available
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
+
+            {/* Pagination Example (You may need to customize it based on API response) */}
             <div className="card-footer d-block d-md-flex align-items-center d-print-none">
               <div className="d-flex mb-2 mb-md-0">
-                Showing 1 to 8 of 24 Entries
+                Showing 1 to {historyData.length} of {historyData.length} Entries
               </div>
 
-              <nav
-                className="d-flex ml-md-auto d-print-none"
-                aria-label="Pagination"
-              >
+              <nav className="d-flex ml-md-auto d-print-none" aria-label="Pagination">
                 <ul className="pagination justify-content-end font-weight-semi-bold mb-0">
-                  {" "}
                   <li className="page-item">
-                    {" "}
-                    <a
-                      id="datatablePaginationPrev"
-                      className="page-link"
-                      href="#!"
-                      aria-label="Previous"
-                    >
+                    <a id="datatablePaginationPrev" className="page-link" href="#!" aria-label="Previous">
                       <i className="gd-angle-left icon-text icon-text-xs d-inline-block"></i>
-                    </a>{" "}
+                    </a>
                   </li>
                   <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePaginationPage0"
-                      className="page-link active"
-                      href="#!"
-                      data-dt-page-to="0"
-                    >
+                    <a id="datatablePaginationPage0" className="page-link active" href="#!" data-dt-page-to="0">
                       1
                     </a>
                   </li>
-                  <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePagination1"
-                      className="page-link"
-                      href="#!"
-                      data-dt-page-to="1"
-                    >
-                      2
-                    </a>
-                  </li>
-                  <li className="page-item d-none d-md-block">
-                    <a
-                      id="datatablePagination2"
-                      className="page-link"
-                      href="#!"
-                      data-dt-page-to="2"
-                    >
-                      3
-                    </a>
-                  </li>
+                  {/* Add more pagination items dynamically based on data length */}
                   <li className="page-item">
-                    {" "}
-                    <a
-                      id="datatablePaginationNext"
-                      className="page-link"
-                      href="#!"
-                      aria-label="Next"
-                    >
+                    <a id="datatablePaginationNext" className="page-link" href="#!" aria-label="Next">
                       <i className="gd-angle-right icon-text icon-text-xs d-inline-block"></i>
-                    </a>{" "}
-                  </li>{" "}
+                    </a>
+                  </li>
                 </ul>
               </nav>
             </div>
           </div>
-          {/* <!-- End Users --> */}
+          {/* End Users Table */}
         </div>
       </div>
     </div>

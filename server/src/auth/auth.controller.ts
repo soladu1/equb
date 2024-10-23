@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { Response } from 'express';
@@ -36,6 +36,11 @@ export class AuthController {
     return this.authService.verifiToken(res, req);
   }
 
+  @Patch('update')
+  async update(@Body() updateUserDto: CreateAuthDto) { // <-- Added @Body() here
+    return this.authService.update(updateUserDto); // Pass to service
+  }
+  
   @Post('log-out')
    @Public()
    async Logout(@Res() res: Response, @Req() req: CustomRequest) {

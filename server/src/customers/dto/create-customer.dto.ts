@@ -2,7 +2,7 @@ import { Categoray } from "src/categoray/entities/categoray.entity";
 
 export class CreateCustomerDto {
     Name : string;
-    Phone : number;
+    Phone : string;
     WorkingPlace: string;
     Gender: string;
     categoryId: any

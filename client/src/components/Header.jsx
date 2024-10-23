@@ -2,17 +2,20 @@ import React from "react";
 import logoMini from "../assets/img/logo-mini.png";
 import logo from "../assets/img/logo.png";
 import { logOut } from "../features/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import removeCookie from "../auth/removeCookie";
 import Notif_Toast from "./Tost";
 import { useToast } from "@chakra-ui/react";
+const API = import.meta.env.VITE_API_URL;
 
 // import av from "../assets/img/av.png";
 // import SideBar from "./SideBar";
 
 const Header = () => {
+  const user = useSelector((state) => state.auth.user);
+
   const toast = useToast()
   const toggleSidebar = (e) => {
     e.preventDefault();
@@ -47,7 +50,7 @@ const Header = () => {
     try {
       // Make the request to the logout endpoint
       const response = await axios.post(
-        "http://localhost:8000/auth/log-out",
+        `${API}/auth/log-out`,
         {},
         {
           withCredentials: true, // Include cookies in the request
@@ -225,7 +228,7 @@ const Header = () => {
                       aria-expanded="false"
                       data-toggle="dropdown"
                     >
-                      <span className="align-middle">Tati Taye</span>
+                      <span className="align-middle">{user ? user.email :"---"}</span>
                       <i className="gd-angle-down icon-text icon-text-xs align-middle ml-3"></i>
                     </a>
 

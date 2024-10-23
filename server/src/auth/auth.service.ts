@@ -18,7 +18,6 @@ import { CustomRequest } from './custom-request.interface';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -81,6 +80,58 @@ export class AuthService {
       }
     }
   }
+  /////////
+  async update(updateUserDto: CreateAuthDto) {
+    console.log(updateUserDto, 'dtp');
+    try {
+      // Find the user by email
+      const existingUser = await this.userRepository.findOne({
+        where: { email: updateUserDto.email },
+      });
+      console.log(existingUser, 'ex user');
+      // Check if the user exists
+      if (!existingUser) {
+        throw new Error('User not found');
+      }
+
+      if (updateUserDto.Password) {
+        // Verify if the provided old password matches the stored password
+        const isPasswordMatching = await bcrypt.compare(
+          updateUserDto.old_password,
+          existingUser.Password,
+        );
+        if (!isPasswordMatching) {
+          throw new Error('Current password is incorrect');
+        }
+        const hashedNewPassword = await bcrypt.hash(updateUserDto.Password, 10);
+        existingUser.Password = hashedNewPassword;
+      }
+
+      // If passwords match, hash the new password and update it
+
+      // Update the user’s phone number as well (if provided)
+      if (updateUserDto.phone) {
+        existingUser.phone = updateUserDto.phone;
+      }
+      if (updateUserDto.email) {
+        existingUser.email = updateUserDto.email;
+      }
+
+      // Save the updated user information
+       await this.userRepository.save(existingUser);
+
+      return {
+        message: 'User updated successfully !!!',
+        user: existingUser,
+      };
+    } catch (error) {
+      // Handle errors gracefully
+      return {
+        message: 'Failed to update user',
+        error: error.message,
+      };
+    }
+  }
   /////////////////////////////////
 
   async login(@Body() authDTO: CreateAuthDto, @Res() res: Response) {
@@ -113,7 +164,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email, phone: user.phone };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: jwtConstants.Access_secret,
@@ -131,7 +182,7 @@ export class AuthService {
       sameSite: 'strict', // or 'lax'
     });
 
-    return res.send({ accessToken });
+    return res.send({ accessToken, user: payload });
   }
   /////////////////////////////////
   private extractAccessToken(access_token: string) {

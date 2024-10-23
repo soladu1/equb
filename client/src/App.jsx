@@ -12,10 +12,11 @@ import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useRefreshToken from "./hooks/useRefreshToken";
 import verifyToken from "./middleware/verifiToken";
-import { Adduser } from "./pages/AddNew_User";
-import { Categorays } from "./pages/Categoray";
+import { AddUser } from "./pages/AddNew_User";
 import { Newekub } from "./pages/Newekub";
 import { History } from "./pages/History";
+import { Categorays } from "./pages/Categoray";
+import { HistoryDetails } from "./pages/HistoryDetails";
 
 function App() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -79,7 +80,7 @@ function App() {
             />
             <Route
               path={"/adduser"}
-              element={isVerified ? <Adduser /> : <Signup />}
+              element={isVerified ? <AddUser /> : <Signup />}
             />
               <Route
               path={"/newekub"}
@@ -88,6 +89,10 @@ function App() {
             <Route
               path="/categorays/:id"
               element={isVerified ? <Categorays /> : <Signup />}
+            />
+               <Route
+              path="/historyDetails/:id"
+              element={isVerified ? <HistoryDetails /> : <Signup />}
             />
             <Route path="*" element={<Notfound />} />
           </Routes>
