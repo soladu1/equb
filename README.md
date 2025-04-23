@@ -1,1 +1,1 @@
-# equb
+this is a guide document
